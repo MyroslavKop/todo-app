@@ -2,7 +2,7 @@ import {useContext} from "react";
 
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import ProgressBar from "../ProgressBar";
+import ProgressBar from "./ProgressBar";
 import Container from "@mui/material/Container";
 import ToDoModalWindow from "../ModalWindow/ToDoModalWindow";
 

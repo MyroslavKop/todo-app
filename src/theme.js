@@ -17,7 +17,7 @@ const theme = createTheme({
                     minWidth: "200px",
                     padding: "5px",
                     height: "48px",
-                    color: "#f6f7fb",
+                    color: "#f6f7fb" || "black",
                     "&::before": {
                         borderBottom: "2px solid #868fbf!important"
                     },

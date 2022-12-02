@@ -15,7 +15,6 @@ import ToDoContext from "../../../context/todo/ToDoContext";
 import ModalWindowContext from "../../../context/modalWindow/ModalWindowContext";
 import {modalWindowForm} from "./styles";
 
-
 const AddToDoForm = () => {
     const {toDo, setToDo} = useContext(ToDoContext);
     const {setOpen} = useContext(ModalWindowContext);

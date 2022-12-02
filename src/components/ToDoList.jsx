@@ -1,4 +1,4 @@
-import {useContext} from "react";
+import {useContext, useState} from "react";
 
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -11,17 +11,40 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";
 import Grid from "@mui/material/Grid";
 import AddIcon from "@mui/icons-material/Add";
+import TextField from "@mui/material/TextField";
+import CheckIcon from "@mui/icons-material/Check";
 
 import ToDoContext from "../context/todo/ToDoContext";
 import ModalWindowContext from "../context/modalWindow/ModalWindowContext";
+
 
 const ToDoList = () => {
     const {toDo, setToDo} = useContext(ToDoContext);
     const {setOpen} = useContext(ModalWindowContext);
 
-    const handleOpen = () => {
-        setOpen(true);
+    const [edit, setEdit] = useState(null);
+    const [titleValue, setTitleValue] = useState("");
+    const [descriptionValue, setDescriptionValue] = useState("");
+
+    const handleEdit = (id, title, description) => () => {
+        setEdit(id);
+        setTitleValue(title);
+        setDescriptionValue(description);
     };
+
+    const handleSave = (id) => () => {
+        const newToDo = [...toDo].map(item => {
+            if (item.id === id) {
+                item.title = titleValue;
+                item.description = descriptionValue;
+            }
+            return item;
+        });
+        setToDo(newToDo);
+        setEdit(null);
+    };
+
+    const handleOpen = () => setOpen(true);
 
     const handleDelete = (id) => () => {
         const newToDo = [...toDo].filter(item => item.id !== id);
@@ -47,47 +70,80 @@ const ToDoList = () => {
                             sx={{
                                 borderLeft: `8px solid ${color}`,
                                 minHeight: "200px",
-                                backgroundColor: status && "#bdbdbd"
+                                backgroundColor: (status && "#bdbdbd") || (edit === id && "#46529d")
                             }}>
                             <CardContent>
                                 <Box display="flex" alignItems="center">
-                                    <Checkbox
-                                        checked={status}
-                                        disabled={status}
-                                        sx={{padding: 0, marginRight: 1}}
-                                        onChange={handleStatus(id)}/>
-                                    <Typography
-                                        variant="h5"
-                                        component="div"
-                                        sx={{
-                                            textDecoration: status && "line-through",
-                                            fontSize: {
-                                                xs: "20px",
-                                                sm: "25px"
-                                            }
-                                        }}>{title}</Typography>
+                                    {edit === id ?
+                                        <TextField
+                                            variant="standard"
+                                            placeholder="Description"
+                                            fullWidth
+                                            value={titleValue}
+                                            onChange={(event) => setTitleValue(event.target.value)}
+                                        />
+                                        :
+                                        <>
+                                            <Checkbox
+                                                checked={status}
+                                                disabled={status}
+                                                sx={{padding: 0, marginRight: 1}}
+                                                onChange={handleStatus(id)}/>
+                                            <Typography
+                                                variant="h5"
+                                                component="div"
+                                                sx={{
+                                                    textDecoration: status && "line-through",
+                                                    fontSize: {
+                                                        xs: "20px",
+                                                        sm: "25px"
+                                                    }
+                                                }}>{title}</Typography>
+                                        </>
+                                    }
                                 </Box>
                                 <Typography
                                     sx={{mb: 1.5, fontSize: 15}}
-                                    color="text.secondary">{category}</Typography>
-                                <Typography
-                                    variant="body2"
-                                    fontSize={18}>{description}</Typography>
+                                    color={edit === id ? "#49bbe7" : "#666666"}>{category}</Typography>
+                                {edit === id ?
+                                    <TextField
+                                        variant="standard"
+                                        placeholder="Description"
+                                        value={descriptionValue}
+                                        fullWidth
+                                        onChange={(event) => setDescriptionValue(event.target.value)}
+                                    />
+                                    :
+                                    <Typography
+                                        variant="body2"
+                                        fontSize={18}>{description}</Typography>
+                                }
                             </CardContent>
                             <CardActions>
-                                <IconButton
-                                    disabled={status}
-                                >
-                                    <EditIcon
-                                        sx={{color: status ? "gray" : "black"}}
-                                        fontSize="medium"/>
-                                </IconButton>
-                                <IconButton
-                                    onClick={handleDelete(id)}>
-                                    <DeleteIcon
-                                        sx={{color: "red"}}
-                                        fontSize="medium"/>
-                                </IconButton>
+                                {
+                                    edit === id ?
+                                        <IconButton
+                                            sx={{backgroundColor: "#49bbe7"}}
+                                            onClick={handleSave(id)}>
+                                            <CheckIcon sx={{color: "white"}}/>
+                                        </IconButton> :
+                                        <>
+                                            <IconButton
+                                                disabled={status}
+                                                onClick={handleEdit(id, title, description)}
+                                            >
+                                                <EditIcon
+                                                    sx={{color: status ? "gray" : "black"}}
+                                                    fontSize="medium"/>
+                                            </IconButton>
+                                            <IconButton
+                                                onClick={handleDelete(id)}>
+                                                <DeleteIcon
+                                                    sx={{color: "red"}}
+                                                    fontSize="medium"/>
+                                            </IconButton>
+                                        </>
+                                }
                             </CardActions>
                         </Card>
                     </Grid>))}
@@ -107,7 +163,6 @@ const ToDoList = () => {
                     <AddIcon fontSize="large" sx={{color: "white"}}/>
                 </IconButton>
             </Grid>
-
         </>
     );
 };
