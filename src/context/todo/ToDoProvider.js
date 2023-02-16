@@ -1,45 +1,26 @@
-import {useState} from "react";
-import {randomColor} from "randomcolor";
-
+import { useState, useEffect } from "react";
+import PropTypes from "prop-types";
+import todo from "../../data";
 import ToDoContext from "./ToDoContext";
 
-const todo = [
-    {
-        title: "Read the book",
-        description: "I bought a new book. I'll be sure to read it in my spare time.",
-        category: "Personal",
-        id: 1,
-        status: true,
-        color: randomColor({
-            luminosity: "light",
-        })
-    },
-    {
-        title: "Finish the project.",
-        description: "My job needs to be done.",
-        category: "Business",
-        id:3,
-        status: true,
-        color: randomColor({
-            luminosity: "light",
-        }),
-    },
-    {
-        title: "Learn JavaScript",
-        description: "It's time to start exploring new topics.",
-        category: "Personal",
-        id: 4,
-        status: false,
-        color: randomColor({
-            luminosity: "light",
-        }),
-    }
-]
+const ToDoProvider = ({ children }) => {
+  const [toDo, setToDo] = useState(
+    JSON.parse(localStorage.getItem("todos")) || todo
+  );
 
-const ToDoProvider = ({children}) => {
-    const [toDo, setToDo] = useState(todo);
+  useEffect(() => {
+    localStorage.setItem("todos", JSON.stringify(toDo));
+  }, [toDo]);
 
-    return <ToDoContext.Provider value={{toDo, setToDo}}>{children}</ToDoContext.Provider>;
+  return (
+    <ToDoContext.Provider value={{ toDo, setToDo }}>
+      {children}
+    </ToDoContext.Provider>
+  );
+};
+
+ToDoProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 export default ToDoProvider;
